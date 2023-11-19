@@ -1,0 +1,11 @@
+table{
+    border: 1px solid black;
+    font-family:  'Segoe UI';
+    font-size: 14px;
+}
+td, th {
+    border-right: 1px solid black;
+}
+thead > tr {
+    border-bottom: 1px solid black ;
+}

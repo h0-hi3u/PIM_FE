@@ -1,0 +1,18 @@
+.small-input {
+    height: 30px;
+    /* width: 25%; */
+    border: 1px solid gray;
+}
+label {
+    color: #333;
+    font-family: 'Segoe UI';
+    font-weight: 18pt;
+}
+.large-input {
+    height: 30px;
+    /* width: 70%; */
+    border: 1px solid gray;
+}
+input, select {
+    padding-left: 10px;
+}

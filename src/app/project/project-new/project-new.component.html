@@ -1,0 +1,102 @@
+<div class="pr-56 pl-14">
+    <h1 *ngIf="!isUpdate" class="mt-7 text-2xl border-b border-b-gray-400 pb-5">Project new</h1>
+    <h1 *ngIf="isUpdate" class="mt-7 text-2xl border-b border-b-gray-400 pb-5">Project update</h1>
+
+    <form [formGroup]="createProjectForm" (ngSubmit)="isUpdate ? updateProject() : createProject()"
+        class="w-full h-full flex flex-col gap-7">
+        <div *ngIf="!validForm"
+            class="pl-3 text-base font-semibold text-red-400 bg-red-100 h-8">
+            {{formMessage}} <span
+                (click)="hiddenMessage()"
+                class="float-right items-center pr-5 cursor-pointer text-gray-500">x</span>
+        </div>
+        <div class="grid grid-cols-12 mt-2">
+            <label class="col-start-1 col-end-3">Project Number
+                <span class="text-red-600 text-lg">*</span></label>
+            <input class="small-input col-start-3 col-end-6" type="number"
+                (blur)="checkExistProjectNumber($event.target)"
+                formControlName="projectNumber" />
+            <span *ngIf="isExistProjectNumber"
+                class="col-start-6 col-end-13 text-sm text-red-600 pl-3 flex items-center">
+                The project number already existed. Please select a different
+                project number
+            </span>
+        </div>
+        <div class="grid grid-cols-12">
+            <label class="col-start-1 col-end-3">Project Name<span
+                    class="text-red-600 text-lg">*</span></label>
+            <input type="text" class="large-input col-start-3 col-end-12"
+                formControlName="projectName" />
+        </div>
+        <div class="grid grid-cols-12">
+            <label class="col-start-1 col-end-3">Customer<span
+                    class="text-red-600 text-lg">*</span></label>
+            <input type="text" class="large-input col-start-3 col-end-12"
+                formControlName="customer" />
+        </div>
+        <div class="grid grid-cols-12">
+            <label class="col-start-1 col-end-3">Group<span
+                    class="text-red-600 text-lg">*</span></label>
+            <select class="small-input col-start-3 col-end-6"
+                formControlName="groupId">
+                <option *ngFor="let groupId of listGroupId" value="{{groupId}}">
+                    {{groupId}}
+                </option>
+            </select>
+        </div>
+        <div class="grid grid-cols-12">
+            <label class="col-start-1 col-end-3">Members</label>
+            <ng-multiselect-dropdown
+                formControlName="member"
+                class="h-[30px] col-start-3 col-end-12"
+                [placeholder]="'Select member'"
+                [maxlength]="100"
+                [settings]="dropdownSettings"
+                [data]="dropdownList"
+                [(ngModel)]="selectedItems"
+
+                >
+            </ng-multiselect-dropdown>
+            <!-- <select class="large-input col-start-3 col-end-12">
+                <option selected hidden></option>
+                <option *ngFor="let e of listEmployee" value="{{e.id}}">
+                    {{e.visa + ": " + e.firstName + " " + e.lastName}}
+                </option>
+            </select> -->
+        </div>
+        <div class="grid grid-cols-12">
+            <label class="col-start-1 col-end-3">Status<span
+                    class="text-red-600 text-lg">*</span></label>
+            <select class="small-input col-start-3 col-end-6"
+                formControlName="status">
+                <option value="NEW">New</option>
+                <option value="PLA">Planned</option>
+                <option value="INP">In Progress</option>
+                <option value="FIN">Finished</option>
+            </select>
+        </div>
+        <div class=" grid grid-cols-12 border-b pb-3 border-b-gray-400">
+            <label class="col-start-1 col-end-3">Start date<span
+                    class="text-red-600 text-lg">*</span></label>
+            <input class="small-input col-start-3 col-end-6" type="date"
+               
+                formControlName="startDate">
+
+            <label class="col-start-8 col-end-9">End date</label>
+            <input class="small-input col-start-9 col-end-12" type="date"
+                
+                formControlName="endDate">
+        </div>
+        <div class="flex justify-center gap-7">
+            <button
+                class="h-9 w-[15%] border border-gray-600 text-black rounded"
+                type="button" (click)="cancelCreate()">Cancel</button>
+            <button *ngIf="!isUpdate" class="h-9 w-[15%] bg-[#2F85FA] text-white rounded"
+                [disabled]="isExistProjectNumber"
+                type="submit">Create project</button>
+                <button *ngIf="isUpdate" class="h-9 w-[15%] bg-[#2F85FA] text-white rounded"
+                [disabled]="isExistProjectNumber"
+                type="submit">Update project</button>
+        </div>
+    </form>
+</div>
