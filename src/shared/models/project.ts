@@ -9,7 +9,7 @@ export class Project {
   employees: Employee[] = [];
   status = "";
   startDate = new Date();
-  endDate = new Date();
+  endDate? : any;
 
   // constructor(
   //   id: number,

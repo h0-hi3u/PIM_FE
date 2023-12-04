@@ -9,6 +9,6 @@ import { Router } from '@angular/router';
 export class ErrorPageComponent {
   constructor(private router : Router) {}
   backToProjectList() {
-    this.router.navigate(['project-list/3']);
+    this.router.navigate(['project-list']);
   }
 }

@@ -3,3 +3,6 @@
     height: 100px;
     background-color: orange;
 } */
+.active {
+    color: rgba(59, 130, 246, 1);
+}

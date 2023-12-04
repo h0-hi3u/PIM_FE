@@ -1,8 +1,9 @@
-import { Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import { HandleError } from './handleError.service';
+import { Observable, catchError } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Employee } from '../models/employee';
-import { ResponseDto } from '../models/reponseDto';
+import { ResponseDto } from '../models/responseDto';
 import { environment } from 'src/environment/environment ';
 import { EmployeeDropdown } from '../models/employeeDropdown';
 
@@ -12,11 +13,14 @@ import { EmployeeDropdown } from '../models/employeeDropdown';
 export class EmployeeService {
   private url = 'employee';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private handleError : HandleError) {}
 
   public getAll(): Observable<ResponseDto> {
     return this.http
-      .get<ResponseDto>(`${environment.urlApi}/${this.url}`);
+      .get<ResponseDto>(`${environment.urlApi}/${this.url}`).pipe(
+        catchError(
+          this.handleError.handleError
+          ));
   }
 
   public employeeToEmployeeDropdown(list: Employee[]): EmployeeDropdown[] {

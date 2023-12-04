@@ -9,12 +9,27 @@ import { LayoutComponent } from './layout/layout.component';
 import { ProjectListComponent } from './project/project-list/project-list.component';
 import { ProjectNewComponent } from './project/project-new/project-new.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import {HttpClientModule} from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClient,
+  HttpClientModule,
+} from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorPageComponent } from './error-page/error-page.component';
 import { ConfirmComponent } from './confirm/confirm.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { DatePipe } from '@angular/common';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { LoginComponent } from './login/login.component';
+import { AuthInterceptor } from './guard/authInterceptor';
+import { StoreModule } from '@ngrx/store';
+import { metaReducerLocalStorage, searchSortReducer } from './search-sort-state/search-sort.reducer';
 
+// export function HttpLeaderFactory(http : HttpClient) {
+//   return new TranslateHttpLoader(http);
+// }
 
 @NgModule({
   declarations: [
@@ -25,6 +40,7 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
     ProjectListComponent,
     ErrorPageComponent,
     ConfirmComponent,
+    LoginComponent,
     // ProjectNewComponent
   ],
   imports: [
@@ -34,9 +50,28 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    NgMultiSelectDropDownModule.forRoot()
+    NgMultiSelectDropDownModule.forRoot(),
+    StoreModule.forRoot({ searchSortEntries: searchSortReducer }),
+    // StoreModule.forRoot({ cartEntries: cartReducer }, { metaReducers: [ metaReducerLocalStorage ] })
+    MatTooltipModule,
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLeaderFactory,
+        deps: [HttpClient],
+      },
+    }),
+    StoreModule.forRoot({}, {}),
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    HttpClient,
+    DatePipe,
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
+
+export function HttpLeaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
