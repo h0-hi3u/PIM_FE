@@ -16,9 +16,22 @@ import {
 import { Project } from 'src/shared/models/project';
 import { ResponseDto } from 'src/shared/models/responseDto';
 import { ToastService } from 'src/shared/services/toast.service';
-import { selectCurrentIndexPage, selectSearchStatus, selectSearchText, selectSortCustomer, selectSortName, selectSortNumber, selectSortStartDate, selectSortStatus } from 'src/app/search-sort-state/search-sort.selector';
+import {
+  selectCurrentIndexPage,
+  selectSearchStatus,
+  selectSearchText,
+  selectSortCustomer,
+  selectSortName,
+  selectSortNumber,
+  selectSortStartDate,
+  selectSortStatus,
+} from 'src/app/search-sort-state/search-sort.selector';
 import { Store } from '@ngrx/store';
-import { addSearchSort, clearSearchSort } from 'src/app/search-sort-state/search-sort.action';
+import {
+  addSearchSort,
+  clearSearchSort,
+} from 'src/app/search-sort-state/search-sort.action';
+import { catchError } from 'rxjs';
 @Component({
   selector: 'app-project-list',
   templateUrl: './project-list.component.html',
@@ -49,6 +62,7 @@ export class ProjectListComponent implements OnInit {
   sortStartDate = '0';
   searchText = '';
   searchStatus = '0';
+  errors : any;
 
   searchFrom = this.formBuilder.group({
     searchText: new FormControl(this.searchText),
@@ -82,14 +96,30 @@ export class ProjectListComponent implements OnInit {
     localStorage.setItem('listRemoveId', JSON.stringify([]));
   }
   private loadLocalStorage() {
-    this.store.select(selectSearchText).subscribe(value => this.searchText = value);
-    this.store.select(selectSearchStatus).subscribe(value => this.searchStatus = value);
-    this.store.select(selectSortNumber).subscribe(value => this.sortNumber = value);
-    this.store.select(selectSortName).subscribe(value => this.sortName = value);
-    this.store.select(selectSortStatus).subscribe((value) => this.sortStatus = value);
-    this.store.select(selectSortCustomer).subscribe(value => this.sortCustomer = value);
-    this.store.select(selectSortStartDate).subscribe(value => this.sortStartDate = value);
-    this.store.select(selectCurrentIndexPage).subscribe(value => this.currentPageIndex = value);
+    this.store
+      .select(selectSearchText)
+      .subscribe((value) => (this.searchText = value));
+    this.store
+      .select(selectSearchStatus)
+      .subscribe((value) => (this.searchStatus = value));
+    this.store
+      .select(selectSortNumber)
+      .subscribe((value) => (this.sortNumber = value));
+    this.store
+      .select(selectSortName)
+      .subscribe((value) => (this.sortName = value));
+    this.store
+      .select(selectSortStatus)
+      .subscribe((value) => (this.sortStatus = value));
+    this.store
+      .select(selectSortCustomer)
+      .subscribe((value) => (this.sortCustomer = value));
+    this.store
+      .select(selectSortStartDate)
+      .subscribe((value) => (this.sortStartDate = value));
+    this.store
+      .select(selectCurrentIndexPage)
+      .subscribe((value) => (this.currentPageIndex = value));
   }
   getArrayTotalPage(count: number) {
     for (let i = 1; i < count + 1; i++) {
@@ -188,18 +218,24 @@ export class ProjectListComponent implements OnInit {
           this.sortCustomer,
           this.sortStartDate
         )
-        .subscribe((res: ResponseDto) => {
-          res.data.result.forEach((value: Project) => {
-            if (value.startDate) {
-              value.startDate = new Date(value.startDate);
-            }
-            if (value.endDate) {
-              value.endDate = new Date(value.endDate);
-            }
-            this.projects.push(value);
-          });
-          this.getArrayTotalPage(res.data.totalPage);
-          this.isLoading = false;
+        .subscribe({
+          next: (res: ResponseDto) => {
+            res.data.result.forEach((value: Project) => {
+              if (value.startDate) {
+                value.startDate = new Date(value.startDate);
+              }
+              if (value.endDate) {
+                value.endDate = new Date(value.endDate);
+              }
+              this.projects.push(value);
+            });
+            this.getArrayTotalPage(res.data.totalPage);
+            this.isLoading = false;
+          },
+          error: (error) => {
+            console.log(error);
+          },
+          complete: () => {},
         });
     }
   }

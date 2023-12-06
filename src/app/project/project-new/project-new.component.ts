@@ -90,6 +90,7 @@ export class ProjectNewComponent implements OnInit {
         .getProjectUpdate(parseInt(this.updateId))
         .subscribe((res: ResponseDto) => {
           this.project = res.data;
+          console.log(this.project);
           res.data.endDate || (this.project.endDate = null);
           this.selectedItems = this.employeeService.employeeToEmployeeDropdown(
             this.project.employees
@@ -109,6 +110,7 @@ export class ProjectNewComponent implements OnInit {
               new Date(this.project.endDate).toISOString().split('T')[0]
             );
           }
+          this.getForm.version.setValue(this.project.version || '');
         });
       //this.createProjectForm.get('projectNumber')?.disable();
     }
@@ -178,12 +180,13 @@ export class ProjectNewComponent implements OnInit {
       Validators.maxLength(50),
       Validators.required,
     ]),
-    customer: new FormControl('', [Validators.required]),
+    customer: new FormControl('', [Validators.required, Validators.maxLength(50)]),
     groupId: new FormControl('', [Validators.required]),
     member: new FormControl([], [Validators.required]),
     status: new FormControl('NEW', [Validators.required]),
     startDate: new FormControl('', [Validators.required]),
     endDate: new FormControl(''),
+    version: new FormControl('')
   });
   get getForm() {
     return this.createProjectForm.controls;
@@ -204,10 +207,6 @@ export class ProjectNewComponent implements OnInit {
       this.getForm.groupId.valid &&
       this.getForm.status.valid &&
       this.getForm.startDate.valid;
-    // && this.checkDateValid(this.getForm.startDate.value?.toString(), this.getForm.endDate.value?.toString());
-    if (this.createProjectForm.invalid) {
-      console.log(this.getForm.projectNumber.errors);
-    }
     if (!check) {
       this.formMessage = 'inputFullBlank';
       this.validForm = check;
@@ -312,6 +311,8 @@ export class ProjectNewComponent implements OnInit {
       if (valueForm.endDate != undefined) {
         projectUpdate.endDate = new Date(valueForm.endDate);
       }
+      projectUpdate.version = valueForm.version || '';
+      
       this.projectService.updateProject(projectUpdate).subscribe({
         next: (res: ResponseDto) => {
           if (res.isSuccess) {

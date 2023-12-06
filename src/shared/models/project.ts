@@ -1,3 +1,4 @@
+import { Timestamp } from "rxjs";
 import { Employee } from "./employee";
 
 export class Project {
@@ -10,7 +11,7 @@ export class Project {
   status = "";
   startDate = new Date();
   endDate? : any;
-
+  version = '';
   // constructor(
   //   id: number,
   //   groupId: number,

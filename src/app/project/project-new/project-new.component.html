@@ -16,7 +16,7 @@
         <div class="grid grid-cols-12 mt-14">
             <label class="col-start-1 col-end-3">{{'projectNumber' | translate}}
                 <span class="text-red-600 text-lg">*</span></label>
-            <input class="small-input col-start-3 col-end-6" type="number"
+            <input class="small-input col-start-3 col-end-6 text-end" type="number"
                 [readonly]="isUpdate ? true : false"
                 (blur)="isUpdate ? '' : checkExistProjectNumber($event.target)"
                 formControlName="projectNumber" />
@@ -43,8 +43,8 @@
         <div class="grid grid-cols-12 relative">
             <label class="col-start-1 col-end-3">{{'customer' | translate}}<span
                     class="text-red-600 text-lg">*</span></label>
-            <input type="text" class="large-input col-start-3 col-end-12" 
-                formControlName="customer" />
+            <input type="text" class="large-input col-start-3 col-end-12" (keyup)="checkMaxLength($event.target, 50)"
+                formControlName="customer" maxlength="50" />
                 <span class="absolute top-8 text-blue-400 left-[17%] hidden">{{messageLength | translate}}</span>
             
         </div>
@@ -101,7 +101,7 @@
                 (blur)="checkEndDate($event.target)"
                 formControlName="endDate">
         </div>
-        <div class="flex justify-center gap-7">
+        <div class="flex justify-end gap-7 w-[80%]">
             <button
                 class="h-9 w-[20%] border border-gray-600 text-black rounded"
                 [disabled]="isProcessing"
