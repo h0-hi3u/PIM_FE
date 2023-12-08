@@ -11,6 +11,7 @@ import {
   faArrowUp,
   faArrowDown,
   faSpinner,
+  faLaptopHouse,
   // fa-spinner fa-pulse
 } from '@fortawesome/free-solid-svg-icons';
 import { Project } from 'src/shared/models/project';
@@ -54,14 +55,14 @@ export class ProjectListComponent implements OnInit {
   arrayTotalPage: number[] = [];
   listRemoveId: number[] = [];
   pageSize = 10;
-  currentPageIndex = -1;
-  sortNumber = '0';
-  sortName = '0';
-  sortStatus = '0';
-  sortCustomer = '0';
-  sortStartDate = '0';
-  searchText = '';
-  searchStatus = '0';
+  currentPageIndex = parseInt(localStorage.getItem("currentPageIndex") || '-1');
+  sortNumber = localStorage.getItem("sortNumber") || '0';
+  sortName =localStorage.getItem("sortName") || '0';
+  sortStatus = localStorage.getItem("sortStatus") ||'0';
+  sortCustomer = localStorage.getItem("sortCustomer") || '0';
+  sortStartDate = localStorage.getItem("sortStartDate") || '0';
+  searchText = localStorage.getItem("searchText") || '';
+  searchStatus = localStorage.getItem("searchStatus") || '0';
   errors : any;
 
   searchFrom = this.formBuilder.group({
@@ -88,11 +89,22 @@ export class ProjectListComponent implements OnInit {
     // this.store.select(selectSortStartDate).subscribe(value => this.sortStartDate = value);
     // this.store.select(selectCurrentIndexPage).subscribe(value => this.currentPageIndex = value);
   }
+  initLocalStorageSearchSort() {
+    localStorage.setItem("currentPageIndex", '1');
+    localStorage.setItem("sortNumber", "0");
+    localStorage.setItem("sortName", "0");
+    localStorage.setItem("sortStatus", "0");
+    localStorage.setItem("sortCustomer", "0");
+    localStorage.setItem("sortStartDate", "0");
+    localStorage.setItem("searchText", "");
+    localStorage.setItem("searchStatus", "0");
+  }
 
   ngOnInit(): void {
     // this.loadLocalStorage();
     // this.movePage(this.currentPageIndex);
-    this.movePage(1);
+    this.initLocalStorageSearchSort();
+    this.movePage();
     localStorage.setItem('listRemoveId', JSON.stringify([]));
   }
   private loadLocalStorage() {
@@ -128,7 +140,11 @@ export class ProjectListComponent implements OnInit {
   }
   //#region Search, reset search and sort, sort
   resetSearch() {
+    this.initLocalStorageSearchSort()
+    this.initValueForm.searchText = "";
+    this.initValueForm.searchStatus = '0';
     this.searchFrom.reset(this.initValueForm);
+    
     // this.store.dispatch(clearSearchSort());
     // this.loadLocalStorage();
     this.movePage(1);
@@ -149,6 +165,7 @@ export class ProjectListComponent implements OnInit {
       this.resetSort();
     }
     this.sortNumber = this.sortNumber == this.ASC ? this.DES : this.ASC;
+    localStorage.setItem("sortNumber", this.sortNumber);
     this.movePage(1);
   }
   sortByName() {
@@ -156,6 +173,7 @@ export class ProjectListComponent implements OnInit {
       this.resetSort();
     }
     this.sortName = this.sortName == this.ASC ? this.DES : this.ASC;
+    localStorage.setItem("sortName", this.sortName);
     this.movePage(1);
   }
   sortByStatus() {
@@ -163,6 +181,7 @@ export class ProjectListComponent implements OnInit {
       this.resetSort();
     }
     this.sortStatus = this.sortStatus == this.ASC ? this.DES : this.ASC;
+    localStorage.setItem("sortStatus", this.sortStatus);
     this.movePage(1);
   }
   sortByCustomer() {
@@ -170,6 +189,7 @@ export class ProjectListComponent implements OnInit {
       this.resetSort();
     }
     this.sortCustomer = this.sortCustomer == this.ASC ? this.DES : this.ASC;
+    localStorage.setItem("sortCustomer", this.sortCustomer);
     this.movePage(1);
   }
   sortByStartDate() {
@@ -185,6 +205,7 @@ export class ProjectListComponent implements OnInit {
     this.sortStatus = '0';
     this.sortCustomer = '0';
     this.sortStartDate = '0';
+    this.initLocalStorageSearchSort();
   }
   //#endregion
 
@@ -195,9 +216,11 @@ export class ProjectListComponent implements OnInit {
       this.listRemoveId = JSON.parse(listLocalStorage);
     }
   }
-  movePage(pageIndex: number) {
+  movePage(pageIndex? : number) {
     this.isLoading = true;
-    this.currentPageIndex = pageIndex;
+    this.currentPageIndex = pageIndex || this.currentPageIndex;
+    localStorage.setItem("currentPageIndex", this.currentPageIndex.toString());
+    
     const searchValue = this.searchFrom.value;
     this.projects = [];
     this.arrayTotalPage = [];
@@ -206,10 +229,12 @@ export class ProjectListComponent implements OnInit {
       searchValue.searchText != null &&
       searchValue.searchText != undefined
     ) {
+      localStorage.setItem("searchText", searchValue.searchText);
+      localStorage.setItem("searchStatus", searchValue.searchStatus);
       this.projectService
         .pagingProject(
           this.pageSize,
-          pageIndex,
+          this.currentPageIndex,
           searchValue.searchText,
           searchValue.searchStatus,
           this.sortNumber,
